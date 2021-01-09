@@ -10,7 +10,13 @@ namespace MARC
         static void Main(string[] args)
         {
             var myConverter = new Toreboda();
-            myConverter.ConvertToXLS(".\\Testfiles\\shelf.iso2709",".\\Testfiles\\test.xls");
+            if(args.Length<1){
+                throw new System.ArgumentException("Du måste ange en sökväg till listan som ett argument!");
+            }
+            var dateString=DateTime.Now.ToShortDateString() + "-" + DateTime.Now.ToShortTimeString().Replace(":",string.Empty);
+            var fromFile = args[0];
+            var toFile = $".\\Testfiles\\{dateString}.xlsx";
+            myConverter.ConvertToXLS(fromFile,toFile);
         }
 
 

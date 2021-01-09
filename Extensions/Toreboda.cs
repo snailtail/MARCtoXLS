@@ -4,14 +4,14 @@ using SwiftExcel;
 
 namespace MARC
 {
-    
+
     public class Toreboda
     {
         private FileMARC marcRecords = new FileMARC();
 
         public Toreboda()
         {
-            
+
         }
 
         public void ConvertToXLS(string fromPath, string toPath)
@@ -29,10 +29,11 @@ namespace MARC
                 245 a (title)
                 245 b (title)
                 942 c (item type)
-                952 a (permanent location)
+                952 a (permanent location) (TORE = Töreboda, 8BYI=Älgarås, 8BYS=Moholm)
                 952 c (shelving location)
             **/
             int xlRow = 1;
+
             using (var ew = new ExcelWriter(toPath))
             {
                 ew.Write($"Författare", 1, xlRow);
@@ -48,7 +49,7 @@ namespace MARC
                     List<Field> locationFields = record.GetFields("952");
 
                     string Author;
-                    string CoAuthors ="";
+                    string CoAuthors = "";
                     string Title;
                     string Type;
                     string Placement;
@@ -60,7 +61,7 @@ namespace MARC
                     }
                     else
                     {
-                        if(authorField.IsDataField())
+                        if (authorField.IsDataField())
                         {
                             DataField authorDataField = (DataField)authorField;
                             Subfield authorName = authorDataField['a'];
@@ -96,16 +97,17 @@ namespace MARC
                                     Title = Title.Substring(0, Title.Length - 1);
                                 }
                             }
-                            if(titleB != null)
+                            if (titleB != null)
                             {
+                                Title = Title.TrimEnd();
                                 Title += " ";
                                 Title += titleB.Data;
                                 if (Title.EndsWith("/"))
                                 {
-                                    Title = Title.Substring(0,Title.Length-1);
+                                    Title = Title.Substring(0, Title.Length - 1);
                                 }
                             }
-                            if(coAuthorsField!=null)
+                            if (coAuthorsField != null)
                             {
                                 CoAuthors = coAuthorsField.Data;
                             }
@@ -114,6 +116,10 @@ namespace MARC
                         {
                             Title = "";
                         }
+                    }
+                    if (Title.EndsWith('.'))
+                    {
+                        Title = Title.Substring(0, Title.Length - 1);
                     }
                     #endregion
 
@@ -125,11 +131,11 @@ namespace MARC
                         {
                             DataField typeDataField = (DataField)typeField;
                             Subfield typeData = typeDataField['c'];
-                            if(typeData != null)
+                            if (typeData != null)
                             {
                                 Type = typeData.Data;
                             }
-                            
+
                         }
                         else
                         {
@@ -144,22 +150,60 @@ namespace MARC
                     {
                         if (locationFields[0].IsDataField())
                         {
-                            foreach(DataField locationDataField in locationFields)
+
+                            // Tre steg för placeringslogiken
+                            // 1. Om placering finns i Töreboda (TORE) används den
+                            foreach (DataField locationDataField in locationFields)
                             {
+
                                 Subfield libraryData = locationDataField['a'];
                                 Subfield placementData = locationDataField['c'];
-                                if(libraryData.Data=="TORE")
+                                if (libraryData.Data == "TORE")
                                 {
                                     Placement = placementData.Data;
                                 }
                             }
-                            if(Placement=="") //om inte placeringen TORE hittas, använd första bästa bara.
+
+                            // 2. Om placering är tom, kolla om den finns i Älgarås.
+                            if (Placement == "")
+                            {
+                                foreach (DataField locationDataField in locationFields)
+                                {
+
+                                    Subfield libraryData = locationDataField['a'];
+                                    Subfield placementData = locationDataField['c'];
+                                    if (libraryData.Data == "8BYI")
+                                    {
+                                        Placement = placementData.Data;
+                                    }
+                                }
+                            }
+
+                            // 3. Om placering fortfarande är tom, kolla om den finns i Moholm.
+                            if (Placement == "")
+                            {
+                                foreach (DataField locationDataField in locationFields)
+                                {
+
+                                    Subfield libraryData = locationDataField['a'];
+                                    Subfield placementData = locationDataField['c'];
+                                    if (libraryData.Data == "8BYS")
+                                    {
+                                        Placement = placementData.Data;
+                                    }
+                                }
+                            }
+
+
+                            /**
+                            if(Placement=="") //om inte placeringen TORE, 8BYI eller 8BYS hittas, använd första bästa bara.
                             {
                                 DataField locationDataField = (DataField)locationFields[0];
                                 Subfield placementData = locationDataField['c'];
                                 Placement = placementData.Data;
                             }
-                            
+                            **/
+
                         }
                         else
                         {
@@ -168,18 +212,20 @@ namespace MARC
                     }
                     #endregion
 
-                    if(Author=="")
+
+                    if (Author.EndsWith(','))
                     {
-                        Author = CoAuthors;
+                        Author = Author.Substring(0, Author.Length - 1);
                     }
-                                        
+
+
                     ew.Write($"{Author}", 1, xlRow);
                     ew.Write($"{Title}", 2, xlRow);
                     ew.Write($"{Type}", 3, xlRow);
                     ew.Write($"{Placement}", 4, xlRow);
-                
-                xlRow++;
-            
+
+                    xlRow++;
+
 
                 }
             }
