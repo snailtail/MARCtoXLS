@@ -17,8 +17,9 @@ namespace MARC
         public void ConvertToXLS(string fromPath, string toPath)
         {
             marcRecords.ImportMARC(fromPath);
-            System.Console.WriteLine("Imported file");
+            System.Console.WriteLine($"Imported file '{fromPath}'");
             ExportXLS(toPath);
+            System.Console.WriteLine($"Exported file '{toPath}'");
         }
 
         private void ExportXLS(string toPath)
@@ -94,7 +95,6 @@ namespace MARC
                                 {
                                     Title = Title.Substring(0, Title.Length - 1);
                                 }
-                                //Console.WriteLine($"titleA='{titleA.Data}'");
                             }
                             if(titleB != null)
                             {
@@ -104,7 +104,6 @@ namespace MARC
                                 {
                                     Title = Title.Substring(0,Title.Length-1);
                                 }
-                                    //Console.WriteLine($"titleB='{titleB.Data}'");
                             }
                             if(coAuthorsField!=null)
                             {

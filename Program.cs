@@ -10,7 +10,7 @@ namespace MARC
         static void Main(string[] args)
         {
             var myConverter = new Toreboda();
-            myConverter.ConvertToXLS("shelf.iso2709","test.xls");
+            myConverter.ConvertToXLS(".\\Testfiles\\shelf.iso2709",".\\Testfiles\\test.xls");
         }
 
 
