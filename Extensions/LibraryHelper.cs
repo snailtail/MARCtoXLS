@@ -1,25 +1,57 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using SwiftExcel;
 
 namespace MARC
 {
 
-    public class Toreboda
+    public class LibraryHelper
     {
         private FileMARC marcRecords = new FileMARC();
+        public string[] placementDataFilter;
+        public string sourcePath;
+        public string destinationPath;
+        public bool archiveSourceFile = true;
+        public string archivePath;
+        public string sourceFileFilter;
 
-        public Toreboda()
+
+        public LibraryHelper()
         {
 
         }
 
-        public void ConvertToXLS(string fromPath, string toPath)
+        public void Process()
         {
-            marcRecords.ImportMARC(fromPath);
-            System.Console.WriteLine($"Imported file '{fromPath}'");
-            ExportXLS(toPath);
-            System.Console.WriteLine($"Exported file '{toPath}'");
+
+            DirectoryInfo DI = new DirectoryInfo(sourcePath);
+            var Files = DI.GetFiles(sourceFileFilter);
+            foreach (var file in Files)
+            {
+                ConvertToXLS(file.Name);
+            }
+
+        }
+
+        private void ConvertToXLS(string fileName)
+        {
+            var sourceFile = Path.Combine(sourcePath, fileName);
+            var dateString = DateTime.Now.ToShortDateString() + "-" + DateTime.Now.ToShortTimeString().Replace(":", string.Empty);
+            var destFile = Path.Combine(destinationPath, $"{dateString}_{fileName}.xlsx");
+            marcRecords.ImportMARC(sourceFile);
+            System.Console.WriteLine($"Imported file '{sourceFile}'");
+            ExportXLS(destFile);
+            if (archiveSourceFile)
+            {
+                var archiveFile = Path.Combine(archivePath, $"{dateString}_{fileName}");
+                File.Move(sourceFile, archiveFile);
+            }
+            else
+            {
+                File.Delete(sourceFile);
+            }
+            System.Console.WriteLine($"Exported file '{destFile}'");
         }
 
         private void ExportXLS(string toPath)
@@ -29,7 +61,7 @@ namespace MARC
                 245 a (title)
                 245 b (title)
                 942 c (item type)
-                952 a (permanent location) (TORE = Töreboda, 8BYI=Älgarås, 8BYS=Moholm)
+                952 a (permanent location)
                 952 c (shelving location)
             **/
             int xlRow = 1;
