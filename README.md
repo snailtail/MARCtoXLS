@@ -80,5 +80,7 @@ If you set the boolean archiveSourceFile to true, this option needs to contain a
 ### How to proceed from here  
 
 Either you clone this repository, and run from the code. Or even better, improve the code? Feel free to make Pull Requests if you find something that you think my project needs or could use.  
+
 The other option is to just download the binaries, they are in [/Binaries/Binaries.zip](./Binaries/Binaries.zip)
 You can unzip the files to any location of your choice, configure it via the appsettings.json and just run the `Csharp_Marc.exe` file (or even run the DLL `dotnet .\CSharp_MARC.dll`)
+The binaries have been compiled and tested on Windows x64 platform, and the source code has only been tested on Windows x64.
