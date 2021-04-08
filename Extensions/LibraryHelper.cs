@@ -19,7 +19,7 @@ namespace MARC
 
         public LibraryHelper()
         {
-
+            //nothing special in the constructor so far... :)
         }
 
         public void Process()
@@ -68,10 +68,14 @@ namespace MARC
 
             using (var ew = new ExcelWriter(toPath))
             {
-                ew.Write($"Författare", 1, xlRow);
-                ew.Write($"Titel", 2, xlRow);
-                ew.Write($"Typ", 3, xlRow);
-                ew.Write($"Placering", 4, xlRow);
+                ew.Write($"Author", 1, xlRow);
+                ew.Write($"Title", 2, xlRow);
+                ew.Write($"Type", 3, xlRow);
+                if (placementDataFilter != null)
+                {
+                    ew.Write($"Shelving location", 4, xlRow);
+                }
+
                 xlRow++;
                 foreach (Record record in marcRecords)
                 {
@@ -182,60 +186,25 @@ namespace MARC
                     {
                         if (locationFields[0].IsDataField())
                         {
-
-                            // Tre steg för placeringslogiken
-                            // 1. Om placering finns i Töreboda (TORE) används den
-                            foreach (DataField locationDataField in locationFields)
+                            if (placementDataFilter != null)
                             {
-
-                                Subfield libraryData = locationDataField['a'];
-                                Subfield placementData = locationDataField['c'];
-                                if (libraryData.Data == "TORE")
+                                foreach (var filter in placementDataFilter)
                                 {
-                                    Placement = placementData.Data;
-                                }
-                            }
-
-                            // 2. Om placering är tom, kolla om den finns i Älgarås.
-                            if (Placement == "")
-                            {
-                                foreach (DataField locationDataField in locationFields)
-                                {
-
-                                    Subfield libraryData = locationDataField['a'];
-                                    Subfield placementData = locationDataField['c'];
-                                    if (libraryData.Data == "8BYI")
+                                    if (Placement == "")
                                     {
-                                        Placement = placementData.Data;
+                                        foreach (DataField locationDataField in locationFields)
+                                        {
+
+                                            Subfield libraryData = locationDataField['a'];
+                                            Subfield placementData = locationDataField['c'];
+                                            if (libraryData.Data == filter)
+                                            {
+                                                Placement = placementData.Data;
+                                            }
+                                        }
                                     }
                                 }
                             }
-
-                            // 3. Om placering fortfarande är tom, kolla om den finns i Moholm.
-                            if (Placement == "")
-                            {
-                                foreach (DataField locationDataField in locationFields)
-                                {
-
-                                    Subfield libraryData = locationDataField['a'];
-                                    Subfield placementData = locationDataField['c'];
-                                    if (libraryData.Data == "8BYS")
-                                    {
-                                        Placement = placementData.Data;
-                                    }
-                                }
-                            }
-
-
-                            /**
-                            if(Placement=="") //om inte placeringen TORE, 8BYI eller 8BYS hittas, använd första bästa bara.
-                            {
-                                DataField locationDataField = (DataField)locationFields[0];
-                                Subfield placementData = locationDataField['c'];
-                                Placement = placementData.Data;
-                            }
-                            **/
-
                         }
                         else
                         {
@@ -254,7 +223,11 @@ namespace MARC
                     ew.Write($"{Author}", 1, xlRow);
                     ew.Write($"{Title}", 2, xlRow);
                     ew.Write($"{Type}", 3, xlRow);
-                    ew.Write($"{Placement}", 4, xlRow);
+                    if (placementDataFilter != null)
+                    {
+                        ew.Write($"{Placement}", 4, xlRow);
+                    }
+
 
                     xlRow++;
 
