@@ -83,4 +83,6 @@ Either you clone this repository, and run from the code. Or even better, improve
 
 The other option is to just download the binaries, they are in [/Binaries/Binaries.zip](./Binaries/Binaries.zip)
 You can unzip the files to any location of your choice, configure it via the appsettings.json and just run the `Csharp_Marc.exe` file (or even run the DLL `dotnet .\CSharp_MARC.dll`)
-The binaries have been compiled and tested on Windows x64 platform, and the source code has only been tested on Windows x64.
+The binaries have been compiled and tested on Windows x64 platform, and the source code has only been tested on Windows x64.  
+
+You can also download from the Releases page, there is one release for .net 5.0, and one for .net Framework 4.7 - which only works on Windows machines. If you are unsure, try the 4.7 version.
