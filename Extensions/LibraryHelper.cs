@@ -153,7 +153,7 @@ namespace MARC
                             Title = "";
                         }
                     }
-                    if (Title.EndsWith('.'))
+                    if (Title.EndsWith("."))
                     {
                         Title = Title.Substring(0, Title.Length - 1);
                     }
@@ -214,7 +214,7 @@ namespace MARC
                     #endregion
 
 
-                    if (Author.EndsWith(','))
+                    if (Author.EndsWith(","))
                     {
                         Author = Author.Substring(0, Author.Length - 1);
                     }
